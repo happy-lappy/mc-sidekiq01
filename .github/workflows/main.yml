@@ -58,8 +58,7 @@ jobs:
         continue-on-error: true
         run: |
           cd appy-dev
-          parallel -u ::: 'pip3 install --no-cache-dir wheel && pip3 install --no-cache-dir -r requirements.txt' 'sudo bash depend.sh'
-          sudo bash depend_web.sh
+          parallel -u ::: 'pip3 install --no-cache-dir wheel && pip3 install --no-cache-dir -r requirements.txt' 'bash depend.sh' 'bash depend_web.sh'
       - name: "Build app package"
         timeout-minutes: 345
         continue-on-error: true
