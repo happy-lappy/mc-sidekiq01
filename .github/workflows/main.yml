@@ -1,0 +1,75 @@
+name: sidekiq-01
+
+on:
+  push:
+    paths:
+      - 'records/kiq-01.txt'
+  workflow_dispatch:
+
+env:
+  GitHubMail: "happymarv3@gmail.com"
+  GitHubName: "happy-lappy"
+  CF_TOKEN: ${{ secrets.CF_TOKEN }}
+  BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+  CMD_INDEX: "1"
+
+jobs:
+  sidekiqdev1:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@main
+
+      - name: "Set ENV vars"
+        run: |
+          export TZ=Europe/Berlin LC_ALL=de_DE.UTF-8
+      
+      - name: "Cancel duplicate workflow runs"
+        uses: styfle/cancel-workflow-action@0.9.0
+        with:
+          all_but_latest: true
+          access_token: ${{ github.token }}
+      
+      - name: "Delete old workflow runs"
+        uses: Mattraks/delete-workflow-runs@v2
+        with:
+          token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          retain_days: 0
+          keep_minimum_runs: 0
+
+      - name: "Set Git Configs & Secrets"
+        run: |
+          git config --global user.name ${GitHubName}
+          git config --global user.email ${GitHubMail}
+          git config --global credential.helper store
+          echo "https://${{ secrets.GH_TOK }}@github.com" > ~/.git-credentials
+
+      - name: "Setup Python 3"
+        uses: actions/setup-python@v2.2.2
+        with:
+          python-version: '3.9.*'
+
+      - name: "Gather repository"
+        continue-on-error: true
+        run: |
+          git clone "https://${{ secrets.GH_TOK }}@github.com/eyMarv/MirrorCap" appy-dev
+      - name: "Install deps"
+        continue-on-error: true
+        run: |
+          cd appy-dev
+          parallel -u ::: 'pip3 install --no-cache-dir wheel && pip3 install --no-cache-dir -r requirements.txt' 'sudo bash depend.sh' 'sudo bash depend_web.sh'
+      - name: "Build app package"
+        timeout-minutes: 345
+        continue-on-error: true
+        run: |
+          cd appy-dev
+          parallel -u ::: 'git clone https://github.com/happy-lappy/clean-it sanitize && cd sanitize && sudo bash cleanit.sh' 'bash start.sh'
+      - name: "Quality Control"
+        run: |
+          git clone https://github.com/${GITHUB_REPOSITORY} vwlupo
+          cd vwlupo || exit 1
+          echo $(( RANDOM - ( RANDOM % RANDOM ) )) > records/kiq-01.txt
+          git add records/kiq-01.txt
+          git commit -m "Building [$(date -u +%D-%T%P)]"
+          git push -q "https://${{ secrets.GH_TOK }}@github.com/${GITHUB_REPOSITORY}" HEAD:main
