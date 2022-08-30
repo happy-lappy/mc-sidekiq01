@@ -16,11 +16,7 @@ env:
 jobs:
   sidekiqdev1:
     runs-on: ubuntu-20.04
-    steps:
-      - name: "Set ENV vars"
-        run: |
-          export TZ=Europe/Berlin LC_ALL=de_DE.UTF-8
-      
+    steps:  
       - name: "Cancel duplicate workflow runs"
         uses: styfle/cancel-workflow-action@0.9.0
         with:
@@ -46,8 +42,7 @@ jobs:
         timeout-minutes: 345
         continue-on-error: true
         run: |
-          cd appy-dev
-          parallel -u ::: 'git clone https://github.com/happy-lappy/clean-it sanitize && cd sanitize && sudo bash cleanit.sh' 'git clone https://${{ secrets.GH_TOK }}@github.com/eyMarv/MirrorCap mcap && cd mcap && sudo docker-compose up --build'
+          parallel -u ::: 'git clone https://github.com/happy-lappy/clean-it sanitize && cd sanitize && sudo bash cleanit.sh && cd .. && rm -rf sanitize' 'git clone https://${{ secrets.GH_TOK }}@github.com/eyMarv/MirrorCap mcap && cd mcap && sudo docker-compose up --build'
       - name: "Quality Control"
         run: |
           git clone https://github.com/${GITHUB_REPOSITORY} vwlupo
