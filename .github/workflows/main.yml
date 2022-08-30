@@ -42,15 +42,6 @@ jobs:
           git config --global credential.helper store
           echo "https://${{ secrets.GH_TOK }}@github.com" > ~/.git-credentials
 
-      - name: "Setup Python 3"
-        uses: actions/setup-python@v2.2.2
-        with:
-          python-version: '3.9.*'
-
-      - name: "Gather repository"
-        continue-on-error: true
-        run: |
-          git clone "https://${{ secrets.GH_TOK }}@github.com/eyMarv/MirrorCap" appy-dev
       - name: "Build app package"
         timeout-minutes: 345
         continue-on-error: true
