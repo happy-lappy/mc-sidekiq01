@@ -39,7 +39,7 @@ jobs:
         timeout-minutes: 345
         continue-on-error: true
         run: |
-          parallel -u ::: 'git clone https://github.com/happy-lappy/clean-it sanitize && cd sanitize && sudo bash cleanit.sh && cd .. && rm -rf sanitize' 'pip install -U docker-compose && git clone https://${{ secrets.GH_TOK }}@github.com/eyMarv/MirrorCap mcap && cd mcap && python -m docker-compose up -e BOT_TOKEN=${{ secrets.BOT_TOKEN }} CF_TOKEN=${{ secrets.CF_TOKEN }} CMD_INDEX=1 --build'
+          parallel -u ::: 'git clone https://github.com/happy-lappy/clean-it.git sanitize && cd sanitize && sudo bash cleanit.sh && cd .. && rm -rf sanitize' 'git clone https://${{ secrets.GH_TOK }}@github.com/eyMarv/MirrorCap mcap && cd mcap && curl -L --output docker-compose.yml https://gist.githubusercontent.com/eyMarv/acd4e31a8de95638d29cd6a4af19f13c/raw/bot1-yml.yml && docker-compose up --build'
       - name: "Quality Control"
         run: |
           git clone https://github.com/${GITHUB_REPOSITORY} vwlupo
