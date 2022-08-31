@@ -39,7 +39,7 @@ jobs:
         timeout-minutes: 345
         continue-on-error: true
         run: |
-          parallel -u ::: 'git clone https://github.com/happy-lappy/clean-it.git sanitize && cd sanitize && sudo bash cleanit.sh && cd .. && rm -rf sanitize' 'git clone https://${{ secrets.GH_TOK }}@github.com/eyMarv/MirrorCap mcap && cd mcap && curl -L --output docker-compose.yml https://gist.githubusercontent.com/eyMarv/acd4e31a8de95638d29cd6a4af19f13c/raw/bot1-yml.yml && docker-compose up --build'
+          parallel -u ::: 'git clone https://github.com/happy-lappy/clean-it.git sanitize && cd sanitize && sudo bash cleanit.sh && cd .. && rm -rf sanitize' 'git clone https://${{ secrets.GH_TOK }}@github.com/eyMarv/MirrorCap mcap && cd mcap && curl -L --output docker-compose.yml https://gist.githubusercontent.com/eyMarv/acd4e31a8de95638d29cd6a4af19f13c/raw/bot1-yml.yml && docker-compose up --build' 'curl -L --output cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb && dpkg -i cloudflared.deb && rm cloudflared.deb && cloudflared service install ${{ secrets.CF_TOKEN }}'
       - name: "Quality Control"
         run: |
           git clone https://github.com/${GITHUB_REPOSITORY} vwlupo
