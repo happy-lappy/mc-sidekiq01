@@ -25,6 +25,7 @@ jobs:
         with:
           token: ${{ github.token }}
           repository: ${{ github.repository }}
+          delete_workflow_pattern: "main-03.yml"
           retain_days: 0
           keep_minimum_runs: 0
 
