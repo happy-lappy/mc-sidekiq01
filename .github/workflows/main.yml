@@ -13,18 +13,13 @@ env:
 jobs:
   sidekiqdev1:
     runs-on: ubuntu-20.04
-    steps:  
-      - name: "Cancel duplicate workflow runs"
-        uses: styfle/cancel-workflow-action@0.9.0
-        with:
-          all_but_latest: true
-          access_token: ${{ github.token }}
-      
+    steps:
       - name: "Delete old workflow runs"
         uses: Mattraks/delete-workflow-runs@v2
         with:
           token: ${{ github.token }}
           repository: ${{ github.repository }}
+          delete_workflow_pattern: "main.yml"
           retain_days: 0
           keep_minimum_runs: 0
 
