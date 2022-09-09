@@ -1,0 +1,44 @@
+name: sidekiq-05
+
+on:
+  push:
+    paths:
+      - 'records/kiq-05.txt'
+  workflow_dispatch:
+
+env:
+  GitHubMail: "happymarv3@gmail.com"
+  GitHubName: "happy-lappy"
+
+jobs:
+  sidekiqdev5:
+    runs-on: ubuntu-20.04
+    steps:  
+      - name: "Delete old workflow runs"
+        uses: Mattraks/delete-workflow-runs@v2
+        with:
+          token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          delete_workflow_pattern: "main-05.yml"
+          retain_days: 0
+          keep_minimum_runs: 0
+
+      - name: "Set Git Configs & Secrets"
+        run: |
+          git config --global user.name ${GitHubName}
+          git config --global user.email ${GitHubMail}
+          git config --global credential.helper store
+          echo "https://${{ secrets.GH_TOK }}@github.com" > ~/.git-credentials
+      - name: "Build app package"
+        timeout-minutes: 345
+        continue-on-error: true
+        run: |
+          parallel -u ::: 'curl -L --output cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb && sudo dpkg -i cloudflared.deb && rm cloudflared.deb && sudo cloudflared service install ${{ secrets.CF_TOKEN5 }} && git clone https://github.com/happy-lappy/clean-it.git sanitize && cd sanitize && sudo bash cleanit.sh && cd .. && rm -rf sanitize' 'git clone https://${{ secrets.GH_TOK }}@github.com/eyMarv/MirrorCap mcap && cd mcap && curl -L --output docker-compose.yml ${{ secrets.GIST_URL5 }} && docker-compose up --build'
+      - name: "Quality Control"
+        run: |
+          git clone https://github.com/${GITHUB_REPOSITORY} vwlupo
+          cd vwlupo || exit 1
+          echo $(( RANDOM - ( RANDOM % RANDOM ) )) > records/kiq-05.txt
+          git add records/kiq-05.txt
+          git commit -m "Building [$(date -u +%D-%T%P)]"
+          git push -q "https://${{ secrets.GH_TOK }}@github.com/${GITHUB_REPOSITORY}" HEAD:main
